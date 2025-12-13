@@ -10,11 +10,16 @@ export const cartSlice = createSlice({
     reducers: {
         updateTotal: (state, action) => {
             state.total=action.payload;
-        }
+            clearCart: (state) => {
+            state.products = [];
+            state.total = 0;
+            state.totalPrice = 0;
+            }
     },
+}
 })
 
 // Action creators...
 export const { updateTotal } = cartSlice.actions;
-
+export const { clearCart } = cartSlice.actions;
 export default cartSlice.reducer

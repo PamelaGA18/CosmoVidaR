@@ -20,7 +20,15 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-// Agrega estas rutas al principio, después de los middlewares:
+
+app.get('/api/test-payment', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'Payment endpoint is working',
+        timestamp: new Date().toISOString(),
+        stripe_key: process.env.STRIPE_SECRET ? 'configured' : 'missing'
+    });
+});
 
 app.get('/health', (req, res) => {
     res.status(200).json({ 
