@@ -6,10 +6,11 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET)
 module.exports = {
     createCheckoutSesion: async (req, res) => {
         try {
-            const YOUR_DOMAIN = 'http://localhost:3000';
+            const YOUR_DOMAIN = 'https://cosmovida.onrender.com';
             const userId = req.user.id;
             
             console.log(`🛒 Creando sesión de pago para usuario: ${userId}`);
+            console.log(`🌐 URL de retorno: ${YOUR_DOMAIN}`);
             
             const cart = await Cart.findOne({ user: userId }).populate("products.product");
             
