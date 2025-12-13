@@ -5,69 +5,70 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET)
 
 module.exports = {
     createCheckoutSesion: async (req, res) => {
-        try {
-            const YOUR_DOMAIN = 'http://localhost:3000';
-            const userId = req.user.id;
-            
-            console.log(`🛒 Creando sesión de pago para usuario: ${userId}`);
-            
-            const cart = await Cart.findOne({ user: userId }).populate("products.product");
-            
-            if (!cart || cart.products.length === 0) { 
-                return res.status(404).json({ 
-                    success: false, 
-                    message: "Carrito vacío o no encontrado" 
-                }); 
-            }
-            
-            console.log(`📦 Productos en carrito: ${cart.products.length}`);
-            
-            const lineItems = cart.products.map((item) => {
-                return {
-                    price_data: {
-                        currency: 'mxn',
-                        unit_amount: Math.round(item.product.price * 100), // Asegurar número entero
-                        product_data: {
-                            name: item.product.name,
-                            description: item.product.short_desc || 'Producto sin descripción',
-                            images: item.product.images ? [item.product.images] : []
-                        }
-                    },
-                    quantity: item.quantity
-                }
-            });
-            
-            console.log(`💰 Creando sesión de Stripe con ${lineItems.length} items`);
-            
-            const session = await stripe.checkout.sessions.create({
-                ui_mode: 'embedded',
-                line_items: lineItems,
-                mode: 'payment',
-                // IMPORTANTE: Usar return_url sin auth requerida
-                return_url: `${YOUR_DOMAIN}/payment-return?session_id={CHECKOUT_SESSION_ID}&user_id=${userId}`,
-                customer_email: req.user.email, // Opcional: email del usuario
-                metadata: {
-                    user_id: userId.toString()
-                }
-            });
-
-            console.log(`✅ Sesión creada: ${session.id}`);
-            
-            res.json({ 
-                success: true,
-                clientSecret: session.client_secret,
-                sessionId: session.id
-            });
-            
-        } catch (error) {
-            console.error("❌ Error en createCheckoutSesion:", error);
-            res.status(500).json({ 
+    try {
+        const YOUR_DOMAIN = 'http://localhost:3000';
+        const userId = req.user.id;
+        
+        console.log(`🛒 Creando sesión de pago para usuario: ${userId}`);
+        console.log("📤 Datos enviados a Stripe:", JSON.stringify(lineItems, null, 2));
+        const cart = await Cart.findOne({ user: userId }).populate("products.product");
+        
+        if (!cart || cart.products.length === 0) { 
+            return res.status(404).json({ 
                 success: false, 
-                message: "Error creando sesión de pago",
-                error: error.message 
-            });
+                message: "Carrito vacío o no encontrado" 
+            }); 
         }
-    },
+        
+        console.log(`📦 Productos en carrito: ${cart.products.length}`);
+        
+        const lineItems = cart.products.map((item) => {
+            return {
+                price_data: {
+                    currency: 'mxn',
+                    unit_amount: Math.round(item.product.price * 100),
+                    product_data: {
+                        name: item.product.name,
+                        description: item.product.short_desc || 'Producto sin descripción',
+                        // ❌ ELIMINADO: images: item.product.images ? [item.product.images] : []
+                        // ✅ CORRECTO: No incluir el campo de imágenes o dejarlo vacío
+                        images: [] // Array vacío es válido para Stripe
+                    }
+                },
+                quantity: item.quantity
+            }
+        });
+        
+        console.log(`💰 Creando sesión de Stripe con ${lineItems.length} items`);
+        
+        const session = await stripe.checkout.sessions.create({
+            ui_mode: 'embedded',
+            line_items: lineItems,
+            mode: 'payment',
+            return_url: `${YOUR_DOMAIN}/payment-return?session_id={CHECKOUT_SESSION_ID}&user_id=${userId}`,
+            customer_email: req.user.email,
+            metadata: {
+                user_id: userId.toString()
+            }
+        });
+
+        console.log(`✅ Sesión creada: ${session.id}`);
+        
+        res.json({ 
+            success: true,
+            clientSecret: session.client_secret,
+            sessionId: session.id
+        });
+        
+    } catch (error) {
+        console.error("❌ Error en createCheckoutSesion:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Error creando sesión de pago",
+            error: error.message 
+        });
+    }
+},
 
     sessionStatus: async (req, res) => {
         try {
