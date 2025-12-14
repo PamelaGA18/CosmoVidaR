@@ -4,7 +4,11 @@ import { baseUrl } from "../../../environment";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTotal, clearCart } from "../../../state/cartSlice";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { 
+    CheckCircleIcon, 
+    XCircleIcon,
+    ClockIcon 
+} from "@heroicons/react/24/outline";
 
 export default function PaymentReturn() {
     const [status, setStatus] = useState('loading');
@@ -144,7 +148,7 @@ export default function PaymentReturn() {
             case 'canceled':
                 return (
                     <div className="text-center p-8">
-                        <div className="text-red-500 text-2xl font-bold">Pago pendiente o cancelado</h2>
+                        <h2 className="text-red-500 text-2xl font-bold">Pago pendiente o cancelado</h2> {/* ✅ CORREGIDO */}
                         <p className="text-gray-600 mt-2">El pago no se completó.</p>
                         <button 
                             onClick={() => navigate('/cart')}
