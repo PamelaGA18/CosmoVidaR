@@ -1,7 +1,7 @@
 
 import './App.css';
 import { Fragment, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Router } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import ClienteModule from './Cliente/ClienteModule';
 import Home from './Cliente/pages/home/Home';
 import Products from './Cliente/pages/products/Products';
@@ -62,7 +62,7 @@ function App() {
     }
   },[])
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
 
         <Route path="/admin" element={<PrivateAdminRoute><AdminModule /></PrivateAdminRoute>}>
@@ -91,7 +91,7 @@ function App() {
           {/*<Route path="*" element={<NoPage />} /> */}
         </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
