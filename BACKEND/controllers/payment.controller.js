@@ -7,6 +7,12 @@ module.exports = {
     createCheckoutSesion: async (req, res) => {
         try {
             const YOUR_DOMAIN = 'https://cosmovida-frontend.onrender.com';
+
+            console.log("🚨🚨🚨 IMPORTANTE - URL DE RETORNO:");
+            console.log("Backend URL:", process.env.BACKEND_URL);
+            console.log("Frontend URL:", process.env.FRONTEND_URL);
+            console.log("YOUR_DOMAIN actual:", YOUR_DOMAIN);
+            
             const userId = req.user.id;
             
             console.log(`🛒 Creando sesión de pago para usuario: ${userId}`);
