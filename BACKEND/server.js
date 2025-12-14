@@ -20,12 +20,7 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/payment-return', (req, res) => {
-    const { session_id, user_id } = req.query;
-    
-    // Redirigir AL FRONTEND (React) con los parámetros
-    res.redirect(`https://cosmovida.onrender.com/payment-return?session_id=${session_id}&user_id=${user_id}`);
-});
+
 
 app.get('/api/test-payment', (req, res) => {
     res.json({
