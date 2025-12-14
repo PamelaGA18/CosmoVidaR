@@ -26,7 +26,7 @@ import Checkout from './Cliente/pages/checkout/Checkout';
 import axios from 'axios';
 import { baseUrl } from './environment';
 import { updateTotal } from './state/cartSlice';
-import PaymentReturn from './Cliente/pages/payment-return/PaymentReturn';
+import PaymentReturn from './Cliente/pages/PaymentReturn/PaymentReturn';
 import ProductDetails from './Cliente/pages/ProductDetails/ProductDetails';
 import Profile from './Cliente/pages/profile/Profile';
 
