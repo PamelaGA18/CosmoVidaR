@@ -1,7 +1,7 @@
 
 import './App.css';
 import { Fragment, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ClienteModule from './Cliente/ClienteModule';
 import Home from './Cliente/pages/home/Home';
 import Products from './Cliente/pages/products/Products';
