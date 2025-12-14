@@ -6,7 +6,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET)
 module.exports = {
     createCheckoutSesion: async (req, res) => {
         try {
-            const YOUR_DOMAIN = 'https://cosmovida.onrender.com';
+            const YOUR_DOMAIN = 'https://cosmovida-frontend.onrender.com';
             const userId = req.user.id;
             
             console.log(`🛒 Creando sesión de pago para usuario: ${userId}`);
@@ -60,7 +60,7 @@ module.exports = {
                 ui_mode: 'embedded',
                 line_items: lineItems,
                 mode: 'payment',
-                return_url: `${YOUR_DOMAIN}/PaymentReturn?session_id={CHECKOUT_SESSION_ID}&user_id=${userId}`,
+                return_url: `${YOUR_DOMAIN}/#/payment-return?session_id={CHECKOUT_SESSION_ID}&user_id=${userId}`,
                 customer_email: req.user.email,
                 metadata: {
                     user_id: userId.toString()

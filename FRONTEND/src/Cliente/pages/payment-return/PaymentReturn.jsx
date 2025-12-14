@@ -20,6 +20,13 @@ export default function PaymentReturn() {
     const auth = useSelector(state => state.auth.auth);
 
     useEffect(() => {
+        console.log("🔍 URL completa:", window.location.href);
+        console.log("🔍 Hash:", window.location.hash);
+        console.log("🔍 Parámetros de búsqueda:", window.location.search);
+        console.log("🔍 Parámetros de React Router:");
+        console.log("  - session_id:", searchParams.get('session_id'));
+        console.log("  - user_id:", searchParams.get('user_id'));
+
         const verifyPayment = async () => {
             const sessionId = searchParams.get('session_id');
             const userId = searchParams.get('user_id');
