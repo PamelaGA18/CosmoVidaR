@@ -19,53 +19,79 @@ export default function PaymentReturn() {
     const navigate = useNavigate();
     const auth = useSelector(state => state.auth.auth);
 
+    // ✅ NUEVA FUNCIÓN para extraer parámetros del HASH
+    const getParamsFromHash = () => {
+        const hash = window.location.hash;
+        console.log("🔍 Hash completo para análisis:", hash);
+        
+        if (!hash.includes('?')) {
+            return { sessionId: null, userId: null };
+        }
+        
+        // Extraer query string del hash: #/payment-return?session_id=xxx&user_id=yyy
+        const queryPart = hash.split('?')[1];
+        const params = new URLSearchParams(queryPart);
+        
+        return {
+            sessionId: params.get('session_id'),
+            userId: params.get('user_id')
+        };
+    };
+
     useEffect(() => {
-        console.log("🔍 URL completa:", window.location.href);
-        console.log("🔍 Hash:", window.location.hash);
-        console.log("🔍 Parámetros de búsqueda:", window.location.search);
-        console.log("🔍 Parámetros de React Router:");
-        console.log("  - session_id:", searchParams.get('session_id'));
-        console.log("  - user_id:", searchParams.get('user_id'));
+        console.log("=== DEBUG PAYMENT RETURN ===");
+        console.log("1. URL completa:", window.location.href);
+        console.log("2. Hash:", window.location.hash);
+        console.log("3. Search (query string):", window.location.search);
+        
+        // ✅ USAR AMBOS MÉTODOS
+        const fromSearchParams = {
+            sessionId: searchParams.get('session_id'),
+            userId: searchParams.get('user_id')
+        };
+        
+        const fromHash = getParamsFromHash();
+        
+        console.log("4. De searchParams:", fromSearchParams);
+        console.log("5. Del hash:", fromHash);
+        
+        // Decidir cuál usar (priorizar hash si existe)
+        const sessionId = fromHash.sessionId || fromSearchParams.sessionId;
+        const userId = fromHash.userId || fromSearchParams.userId;
+        
+        console.log("6. Final - Usando:", { sessionId, userId });
+        console.log("============================");
+        
+        if (!sessionId) {
+            console.error("❌ No session_id found anywhere");
+            setStatus('error');
+            return;
+        }
 
         const verifyPayment = async () => {
-            const sessionId = searchParams.get('session_id');
-            const userId = searchParams.get('user_id');
-            
-            if (!sessionId) {
-                console.error("❌ No session_id found");
-                setStatus('error');
-                return;
-            }
-
             try {
-                console.log("🔍 Verifying payment with session:", sessionId);
+                console.log("🔍 Verificando pago con session:", sessionId);
                 
-                // Usar la ruta pública del backend
                 const response = await axios.get(
                     `${baseUrl}/payment/public-session-status?session_id=${sessionId}&user_id=${userId}`
                 );
                 
-                console.log("✅ Payment status:", response.data);
+                console.log("✅ Estado del pago:", response.data);
                 
                 if (response.data.success) {
                     setStatus(response.data.status);
                     setCustomerEmail(response.data.customer_email || '');
                     
-                    // ✅ SI EL PAGO FUE EXITOSO:
                     if (response.data.status === 'paid') {
-                        // 1. Limpiar el carrito en Redux
+                        // Limpiar carrito
                         dispatch(clearCart());
-                        
-                        // 2. Actualizar el contador del carrito a 0
                         dispatch(updateTotal(0));
-                        
-                        // 3. Limpiar localStorage relacionado con carrito
                         localStorage.removeItem('cartData');
                         localStorage.removeItem('stripe_session_id');
                         
-                        console.log("🛒 Carrito limpiado exitosamente");
+                        console.log("🛒 Carrito limpiado");
                         
-                        // 4. Obtener info de la orden creada
+                        // Obtener info de orden
                         try {
                             const token = localStorage.getItem('token');
                             if (token) {
@@ -74,13 +100,11 @@ export default function PaymentReturn() {
                                 });
                                 
                                 if (ordersResponse.data.success && ordersResponse.data.orders.length > 0) {
-                                    // Orden más reciente
-                                    const latestOrder = ordersResponse.data.orders[0];
-                                    setOrderId(latestOrder._id);
+                                    setOrderId(ordersResponse.data.orders[0]._id);
                                 }
                             }
                         } catch (orderError) {
-                            console.log("⚠️ Could not fetch order details:", orderError.message);
+                            console.log("⚠️ No se pudo obtener orden:", orderError.message);
                         }
                     }
                 } else {
@@ -88,17 +112,17 @@ export default function PaymentReturn() {
                 }
                 
             } catch (error) {
-                console.error("❌ Error verifying payment:", error);
+                console.error("❌ Error verificando pago:", error);
                 setStatus('error');
             }
         };
 
-        // Pequeño delay para asegurar que Stripe procesó todo
         setTimeout(() => {
             verifyPayment();
         }, 2000);
 
     }, [searchParams, dispatch]);
+
 
     // Renderizar según estado
     const renderContent = () => {

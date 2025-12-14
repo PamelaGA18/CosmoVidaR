@@ -46,6 +46,14 @@ function App() {
   
 
   useEffect(()=>{
+    console.log("=== APP LOADED DEBUG ===");
+    console.log("Current URL:", window.location.href);
+    console.log("Pathname:", window.location.pathname);
+    console.log("React Router Version:", require('react-router-dom').version);
+    
+    // Verificar si PaymentReturn carga
+    console.log("PaymentReturn component:", PaymentReturn);
+
     fetchCart();
 
 
