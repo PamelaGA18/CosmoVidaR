@@ -20,6 +20,10 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
+app.get('/payment-return', (req, res) => {
+    const { session_id, user_id } = req.query;
+    res.redirect(`https://cosmovida.onrender.com/?session=${session_id}&user=${user_id}`);
+});
 
 app.get('/api/test-payment', (req, res) => {
     res.json({
